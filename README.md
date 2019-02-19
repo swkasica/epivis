@@ -1,13 +1,14 @@
 Welcome to epivis!
   
   
-This project is currently under development and I don't recommend it be used right now. If you'd liket to check it out in its dvelopement mode you can do it as follows:
+This project is currently under development and I don't recommend it be used right now. If you'd like to check it out in its dvelopement mode you can do it as follows:
 
 
 ```{r}
-
-devtools::load_all() #make sure that you have devtools installed
-run_epivis() #this will bring up the SHINY application, which is currently in development
+devtools::install_deps() #make sure that you have devtools installed
+devtools::load_all()
+BiocManager::install("ggtree", version = "3.8")
+run_epidrive() #this will bring up the SHINY application, which is currently in development
 
 ```
 

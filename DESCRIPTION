@@ -10,3 +10,17 @@ NeedsCompilation: no
 Packaged: 2018-10-02 00:00:52 UTC; anamaria.crisan
 Author: Ana Crisan [aut, cre]
 Maintainer: Ana Crisan <acrisan@cs.ubc.ca>
+Depends: R (>= 3.5.0)
+Imports:
+  ape,
+  BiocManager,
+  dplyr,
+  ggraph,
+  ggplot2,
+  leaflet,
+  readxl,
+  rmarkdown,
+  sf,
+  shiny,
+  shinydashboard,
+  tidygraph
