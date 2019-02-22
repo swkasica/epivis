@@ -5,3 +5,6 @@
 
 inst/epivis_shiny/sandbox
 inst/epivis_shiny/data
+
+# Ignore directory used for just messsing around
+scratch
