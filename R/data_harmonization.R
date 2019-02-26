@@ -13,7 +13,6 @@
 get_feild_details<-function(feild = NULL,feild_type = NULL,datSource = NULL,obj=NULL,meta){
   
   if(any(c("numeric","integer","Date") %in% feild_type)){return("quant")}
-  
   dat_tmp<-NULL
   index<-which(meta$dataID == datSource)
   
@@ -56,6 +55,7 @@ data_harmonization<-function(...,dataDict=NULL){
   
   allObj<-list(...)
   
+  objNames<-setdiff(as.character(match.call()),c("data_harmonization","dataDict"))
   #use internal data dictionary if none is provided
   # if(is.null(dataDict)){
   #  dataDict = readxl::read_xlsx(system.file("inst/epivis_shiny/data_dictionaries/", "universal_data_dictionary.xlsx", package = "epivis"))
@@ -70,25 +70,32 @@ data_harmonization<-function(...,dataDict=NULL){
                          dataType= sapply(allObj,function(x){x@type}),
                          dataSource = sapply(allObj,function(x){x@source}),
                          dataEntity = rep("dataType",length(allObj)),
+                         dataEnvName = objNames,
                          stringsAsFactors = FALSE)
   
   #-------- EXPLODE DATA ------------------
   # Explode feilds from tables and data types store them in metadata table
   #load necessary data dictionary
   tabScanned<-scanTab(objData=allObj,objMeta=allObjMeta,dataDict=dataDict)
-  
   #add exploded table feilds to data type
   tabScanned<-data.frame(dataID=tabScanned$variable,
                          dataType= tabScanned$class,
                          dataSource = tabScanned$tableSource,
                          dataEntity = rep("feild",nrow(tabScanned)),
+                         dataEnvName = tabScanned$envName,
                          stringsAsFactors = FALSE)
-  
+
   allObjMeta<-rbind(allObjMeta,tabScanned)
   
   # Add some more feild details to the data
-  allObjMeta$feild_detail<-sapply(allObjMeta$dataID,function(var,obj,objMeta){
-    tmp<-dplyr::filter(objMeta,dataID == var)
+  detail_tmp<-apply(cbind(allObjMeta$dataID,allObjMeta$dataEnvName),1,function(x){paste(x[1],x[2],sep =";")})
+
+  allObjMeta$feild_detail<-sapply(detail_tmp,function(var,obj,objMeta){
+    var<-strsplit(var,";")[[1]]
+    
+    tmp<-dplyr::filter(objMeta,dataID == var[1]) %>%
+      dplyr::filter(dataEnvName == var[2])
+    
     if(tmp$dataEntity == "dataType"){
       return(NA)
     }
@@ -170,7 +177,7 @@ data_harmonization<-function(...,dataDict=NULL){
   return(harmonized)
 }
 
-#' Title
+#' Subset Graph
 #'
 #' @param g 
 #' @param cutoff 
@@ -203,7 +210,7 @@ subset_graph<-function(g=NULL,cutoff=0){
   return(g)
 }
 
-#' Title
+#' View entity graph
 #'
 #' @param exploded_graph 
 #' @param cutoff 
@@ -222,7 +229,7 @@ view_entity_graph<-function(exploded_graph = NULL,cutoff=0){
   #Creating the graph objet to view
   p<-ggraph(exploded_graph) +
     geom_edge_link(aes(linetype = edge_type,alpha = jaccard_distance))+
-    geom_node_point(aes(shape = dataEntity,color=dataSource),size=4)+
+    geom_node_point(aes(shape = dataEntity,color=dataEnvName),size=4)+
     scale_shape_manual(values = c(19,20))+
     scale_edge_alpha_continuous(range = c(0.2,1))+
     theme_graph()
