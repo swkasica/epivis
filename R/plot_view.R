@@ -1,7 +1,7 @@
 plot_view<-function(view_obj = NULL,view_num=NULL){
   
   if(is.null(view_num)){
-    view_total<-length(length(view_obj))
+    view_total<-length(view_obj)
     
     stop(sprintf("You must specify which view you want to visualize. There are a total of %d views produced by GEViTRec. Please provide a value to the view_num 1 up to %d",view_total,view_total))
   }
